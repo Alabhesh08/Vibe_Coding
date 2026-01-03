@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Time Log</title>
+
+<style>
+:root {
+  --bg: #0f172a;          /* navy */
+  --card: #111827;        /* dark slate */
+  --accent: #6366f1;      /* indigo */
+  --accent2: #d946ef;     /* magenta */
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --input: #1f2933;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, var(--bg), #020617);
+  color: var(--text);
+}
+
+.container {
+  max-width: 820px;
+  margin: auto;
+}
+
+h2 {
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #e0e7ff;
+}
+
+form {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+input, select, textarea {
+  background: var(--input);
+  color: var(--text);
+  border: 1px solid #374151;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 15px;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.readonly {
+  background: #020617;
+  color: var(--muted);
+}
+
+textarea {
+  grid-column: span 2;
+  resize: none;
+  min-height: 70px;
+}
+
+button {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  color: white;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 600px) {
+  form {
+    grid-template-columns: 1fr;
+  }
+  textarea, button {
+    grid-column: span 1;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Daily Time Log</h2>
+
+<form id="logForm">
+
+  <div class="field">
+    <label>Day</label>
+    <input type="text" id="day" class="readonly" readonly>
+  </div>
+
+  <div class="field">
+    <label>Date</label>
+    <input type="date" id="date">
+  </div>
+
+  <div class="field">
+    <label>Start Time</label>
+    <input type="time" id="startTime" required>
+  </div>
+
+  <div class="field">
+    <label>End Time</label>
+    <input type="time" id="endTime" required>
+  </div>
+
+  <div class="field">
+    <label>Duration (minutes)</label>
+    <input type="number" id="duration" class="readonly" readonly>
+  </div>
+
+  <div class="field">
+    <label>Category</label>
+    <select id="category" required>
+      <option value="">Select</option>
+      <option>Academics</option>
+      <option>Career/Internship</option>
+      <option>Skill Building</option>
+      <option>Health & Habits</option>
+      <option>Personal / Social</option>
+      <option>Life Admin</option>
+      <option>Leisure</option>
+      <option>Unplanned / Drift</option>
+      <option>Miscellaneous</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Task</label>
+    <input type="text" id="task" placeholder="What did you do?" required>
+  </div>
+
+  <div class="field">
+    <label>Energy</label>
+    <select id="energy" required>
+      <option value="">Select</option>
+      <option>High</option>
+      <option>Medium</option>
+      <option>Low</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Value</label>
+    <select id="value" required>
+      <option value="">Select</option>
+      <option>High</option>
+      <option>Medium</option>
+      <option>Low</option>
+    </select>
+  </div>
+
+  <textarea id="notes" maxlength="120" placeholder="Notes (optional, short)"></textarea>
+
+  <button type="submit">Save Entry</button>
+
+</form>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIe45mOgn741-ekK5zURuwEbJpUXpvxb92xejwAkdkDVZuhecHQAxHqjT_A0HWCinuvw/exec";
+
+// Prefill date + day
+const today = new Date();
+date.value = today.toISOString().split("T")[0];
+day.value = today.toLocaleDateString("en-US", { weekday: "long" });
+
+// Update day if date changed
+date.addEventListener("change", () => {
+  const d = new Date(date.value);
+  day.value = d.toLocaleDateString("en-US", { weekday: "long" });
+});
+
+// Duration calculation
+function calcDuration() {
+  if (!startTime.value || !endTime.value) return;
+  const s = new Date(`1970-01-01T${startTime.value}`);
+  const e = new Date(`1970-01-01T${endTime.value}`);
+  let diff = (e - s) / 60000;
+  if (diff < 0) diff += 1440;
+  duration.value = Math.round(diff);
+}
+startTime.addEventListener("change", calcDuration);
+endTime.addEventListener("change", calcDuration);
+
+// Submit
+logForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const payload = {
+    day: day.value,
+    date: date.value,
+    startTime: startTime.value,
+    endTime: endTime.value,
+    duration: duration.value,
+    category: category.value,
+    task: task.value.trim(),
+    energy: energy.value,
+    value: value.value,
+    notes: notes.value.trim()
+  };
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      alert("Saved ✔");
+      logForm.reset();
+      date.value = today.toISOString().split("T")[0];
+      day.value = today.toLocaleDateString("en-US", { weekday: "long" });
+    } else {
+      alert("Save failed");
+    }
+  } catch {
+    alert("Network error");
+  }
+});
+</script>
+
+</body>
+</html>
