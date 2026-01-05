@@ -7,10 +7,10 @@
 
 <style>
 :root {
-  --bg: #0f172a;          /* navy */
-  --card: #111827;        /* dark slate */
-  --accent: #6366f1;      /* indigo */
-  --accent2: #d946ef;     /* magenta */
+  --bg: #0f172a;
+  --card: #111827;
+  --accent: #6366f1;
+  --accent2: #d946ef;
   --text: #e5e7eb;
   --muted: #9ca3af;
   --input: #1f2933;
@@ -83,6 +83,13 @@ textarea {
   min-height: 70px;
 }
 
+.warning {
+  grid-column: span 2;
+  color: #fca5a5;
+  font-size: 13px;
+  display: none;
+}
+
 button {
   grid-column: span 2;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -102,7 +109,7 @@ button:active {
   form {
     grid-template-columns: 1fr;
   }
-  textarea, button {
+  textarea, button, .warning {
     grid-column: span 1;
   }
 }
@@ -115,6 +122,11 @@ button:active {
 <h2>Daily Time Log</h2>
 
 <form id="logForm">
+
+  <div class="field">
+    <label>PIN (required)</label>
+    <input type="password" id="pin" placeholder="Enter PIN" required>
+  </div>
 
   <div class="field">
     <label>Day</label>
@@ -184,6 +196,10 @@ button:active {
 
   <textarea id="notes" maxlength="250" placeholder="Notes (optional, short)"></textarea>
 
+  <div id="pinWarning" class="warning">
+    ❌ Incorrect PIN. Entry not saved.
+  </div>
+
   <button type="submit">Save Entry</button>
 
 </form>
@@ -191,6 +207,9 @@ button:active {
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzIe45mOgn741-ekK5zURuwEbJpUXpvxb92xejwAkdkDVZuhecHQAxHqjT_A0HWCinuvw/exec";
+
+/* 🔐 CHANGE THIS PIN */
+const CORRECT_PIN = "1234";
 
 // Prefill date + day
 const today = new Date();
@@ -218,6 +237,13 @@ endTime.addEventListener("change", calcDuration);
 // Submit
 logForm.addEventListener("submit", async e => {
   e.preventDefault();
+  pinWarning.style.display = "none";
+
+  if (pin.value !== CORRECT_PIN) {
+    pinWarning.style.display = "block";
+    return;
+  }
+
   const payload = {
     day: day.value,
     date: date.value,
