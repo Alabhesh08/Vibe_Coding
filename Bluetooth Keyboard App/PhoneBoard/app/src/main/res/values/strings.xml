@@ -1,4 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PhoneBoard</string>
+    <string name="app_name">BT HID Keyboard</string>
+    <string name="status_initializing">Initializing\u2026</string>
+    <string name="refresh">Refresh</string>
+    <string name="register">Register</string>
+    <string name="connect">Connect</string>
+    <string name="type_here">Type here \u2014 keystrokes are sent live to the paired host</string>
+    <string name="special_keys">Special keys</string>
+    <string name="modifiers">Modifiers (toggle, sent with next char)</string>
+    <string name="k_enter">Enter</string>
+    <string name="k_back">Back</string>
+    <string name="k_tab">Tab</string>
+    <string name="k_esc">Esc</string>
+    <string name="k_space">Space</string>
+    <string name="k_ctrl">Ctrl</string>
+    <string name="k_alt">Alt</string>
+    <string name="k_shift">Shift</string>
+    <string name="k_win">Win</string>
+    <string name="usage_hint">1) Pair phone &amp; laptop in Settings  2) Tap Register  3) Pick laptop, tap Connect  4) Type.</string>
 </resources>

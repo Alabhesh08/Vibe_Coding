@@ -1,3 +1,2 @@
-# PhoneBoard proguard rules
--keep class com.phoneboard.** { *; }
--keepclassmembers class com.phoneboard.HidService$* { *; }
+# Add project specific ProGuard rules here.
+# Keep nothing extra by default.
